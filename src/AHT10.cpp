@@ -105,7 +105,7 @@ uint8_t AHT10::readRawData()
   #endif
   if (Wire.available() != 6)
   {
-    _rawDataBuffer[0] = AHT10_ERROR;                       //for condition when AHT10_FORCE_READ_DATA is not used
+    _rawDataBuffer[0] = AHT10_ERROR;                       //for condition when AHT10_USE_READ_DATA is used
     return AHT10_ERROR;                                    //check rxBuffer & error handler, collision on the i2c bus
   }
 
