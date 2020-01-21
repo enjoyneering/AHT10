@@ -1,0 +1,34 @@
+#######################################
+# Syntax Coloring Map AHT10
+#######################################
+
+#######################################
+# Datatypes	(KEYWORD1)
+#######################################
+
+#######################################
+# Methods and Functions	(KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+readRawData	KEYWORD2
+readTemperature	KEYWORD2
+readHumidity	KEYWORD2
+softReset	KEYWORD2
+setNormalMode	KEYWORD2
+setCycleMode	KEYWORD2
+
+#######################################
+# Instances	(KEYWORD2)
+#######################################
+
+AHT10	KEYWORD2
+
+#######################################
+# Constants	(LITERAL1)
+#######################################
+
+AHT10_FORCE_READ_DATA	LITERAL1
+AHT10_USE_READ_DATA	LITERAL1
+
+AHT10_ERROR	LITERAL1
