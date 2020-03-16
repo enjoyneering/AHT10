@@ -119,7 +119,7 @@ void loop()
   /* prints dynamic humidity data */
   lcd.setCursor(1, 1);
 
-  valueTH = myAHT10.readTemperature(AHT10_USE_READ_DATA);             //use same 6-bytes
+  valueTH = myAHT10.readHumidity(AHT10_USE_READ_DATA);                //use same 6-bytes
 
   if   (valueTH != AHT10_ERROR) lcd.print(valueTH);
   else                          lcd.print(F("xxx"));
