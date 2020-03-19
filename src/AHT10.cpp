@@ -89,7 +89,7 @@ uint8_t AHT10::readRawData()
   /* send measurment command */
   Wire.beginTransmission(_address);
   #if ARDUINO >= 100
-  Wire.write(AHT10_START_MEASURMENT_CMD);
+  Wire.write(AHT10_START_MEASURMENT_CMD);                  //send measurment command
   #else
   Wire.send(AHT10_START_MEASURMENT_CMD);
   #endif
@@ -231,9 +231,10 @@ bool AHT10::setNormalMode(void)
   Wire.beginTransmission(_address);
 
   #if ARDUINO >= 100
-  Wire.write(AHT10_INIT_CMD);
-  Wire.write(AHT10_INIT_CAL_ENABLE);
+  Wire.write(AHT10_INIT_CMD);                        //set command mode
+  Wire.write(AHT10_INIT_CAL_ENABLE);                 //x,0,0,x,0,x,x,x
   #else
+  Wire.send(AHT10_INIT_CMD);
   Wire.send(AHT10_INIT_CAL_ENABLE);
   #endif
 
@@ -260,10 +261,11 @@ bool AHT10::setCycleMode(void)
   Wire.beginTransmission(_address);
 
   #if ARDUINO >= 100
-  Wire.write(AHT10_INIT_CMD);
-  Wire.write(AHT10_INIT_CAL_ENABLE | AHT10_INIT_CYCLE_MODE);
+  Wire.write(AHT10_INIT_CMD);                                //set command mode
+  Wire.write(AHT10_INIT_CYCLE_MODE | AHT10_INIT_CAL_ENABLE); //x,0,1,x,0,x,x,x
   #else
-  Wire.send(AHT10_INIT_CAL_ENABLE | AHT10_INIT_CYCLE_MODE);
+  Wire.send(AHT10_INIT_CMD);
+  Wire.send(AHT10_INIT_CYCLE_MODE | AHT10_INIT_CAL_ENABLE);
   #endif
 
   if (Wire.endTransmission(true) != 0) return false;         //safety check, make sure transmission complete
@@ -332,20 +334,20 @@ bool AHT10::enableFactoryCalCoeff()
   Wire.beginTransmission(_address);
 
   #if ARDUINO >= 100
-  Wire.write(AHT10_INIT_CMD);
-  Wire.write(AHT10_INIT_CAL_ENABLE);
+  Wire.write(AHT10_INIT_CMD);                        //set command mode
+  Wire.write(AHT10_INIT_CAL_ENABLE);                 //x,x,x,x,0,x,x,x
   #else
   Wire.send(AHT10_INIT_CMD);
   Wire.send(AHT10_INIT_CAL_ENABLE);
   #endif
 
-  if (Wire.endTransmission(true) != 0) return false;                  //safety check, make sure transmission complete
+  if (Wire.endTransmission(true) != 0) return false; //safety check, make sure transmission complete
 
   delay(AHT10_COMMAND_DELAY);
 
   /*check calibration enable */
-  if (getCalibrationBit(AHT10_FORCE_READ_DATA) == 0x01) return true;
-                                                        return false;
+  if (getCalibrationBit() == 0x01) return true;
+                                   return false;
 }
 
 
