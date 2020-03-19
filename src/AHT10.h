@@ -65,9 +65,9 @@
 #define AHT10_INIT_CAL_ENABLE      0x08  //load factory calibration coeff
 
 
-#define AHT10_MEASURMENT_DELAY     75    //in milliseconds
-#define AHT10_COMMAND_DELAY        30    //in milliseconds
-#define AHT10_SOFT_RESET_DELAY     20    //in milliseconds
+#define AHT10_MEASURMENT_DELAY     80    //in milliseconds
+#define AHT10_COMMAND_DELAY        35    //in milliseconds
+#define AHT10_SOFT_RESET_DELAY     25    //in milliseconds
 
 #define AHT10_FORCE_READ_DATA      true  //force to read data
 #define AHT10_USE_READ_DATA        false //force to use data from previous read
