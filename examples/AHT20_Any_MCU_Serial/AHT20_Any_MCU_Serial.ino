@@ -44,10 +44,10 @@ void setup()
   
   while (myAHT20.begin() != true)
   {
-    Serial.println(F("AHT10 not connected or fail to load calibration coefficient")); //(F()) save string to flash & keeps dynamic memory free
+    Serial.println(F("AHT20 not connected or fail to load calibration coefficient")); //(F()) save string to flash & keeps dynamic memory free
     delay(5000);
   }
-  Serial.println(F("AHT10 OK"));
+  Serial.println(F("AHT20 OK"));
 
 //Wire.setClock(400000); //experimental I2C speed! 400KHz, default 100KHz
 }
