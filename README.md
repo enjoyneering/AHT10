@@ -28,6 +28,7 @@ Tested on:
 - Arduino STM32
 
 **Prolonged exposure for 60 hours at humidity > 80% can lead to a temporary drift of the signal +3%. Sensor slowly returns to the calibrated state at normal operating conditions.
+
 ***If sampling rate of the measurement is too high, the sensor overheats. To prevent the temperature of the sensor from rising > 0.1°C, read sensor once every 2 seconds.
 
 ****The library returns 255 if a communication error occurs or if the calibration coefficient is off.
