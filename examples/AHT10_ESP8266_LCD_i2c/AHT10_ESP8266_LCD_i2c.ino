@@ -72,7 +72,6 @@ void setup()
   /* AHT10 connection check */
   while (myAHT10.begin(SDA, SCL) != true)
   {
-    lcd.setCursor(0, 0);
     lcd.print(F("AHT10 Error"));
     Serial.println(F("AHT10 not connected or fail to load calibration coefficient"));
     delay(5000);
