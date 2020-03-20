@@ -63,7 +63,8 @@ void setup()
   /* AHT10 connection check */
   while (myAHT10.begin() != true)
   {
-    lcd.print(F("AHT10 not connected or fail to load calibration coefficient")); //(F()) saves string to flash & keeps dynamic memory free
+    lcd.print(F("AHT10 Error"));                             //(F()) saves string to flash & keeps dynamic memory free
+    Serial.println(F("AHT10 not connected or fail to load calibration coefficient"));
     delay(5000);
   }
 
