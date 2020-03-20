@@ -60,10 +60,8 @@ void setup()
   /* LCD connection check */  
   while (lcd.begin(LCD_COLUMNS, LCD_ROWS, LCD_5x8DOTS, SDA, SCL) != true) //20 colums, 4 rows, 5x8 pixels char size
   {
-    digitalWrite(LED, LOW);
-    delay(500);
-    digitalWrite(LED, HIGH);
-    delay(500);
+    Serial.println(F("PCF8574 is not connected or lcd pins declaration is wrong. Only pins numbers: 4,5,6,16,11,12,13,14 are legal."));
+    delay(5000);
   }
 
   lcd.print(F("PCF8574 is OK")); //(F()) saves string to flash & keeps dynamic memory free
