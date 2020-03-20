@@ -1,7 +1,7 @@
 {
   "name":        "AHT10",
-  "keywords":    "humidity, temperature, aht10, aht15, aosong, asair, i2c",
-  "description": "AHT10 & AHT15 Digital Humidity & Temperature Sensor",
+  "keywords":    "humidity, temperature, aht10, aht15, aht20, aosong, asair, i2c",
+  "description": "AHT10, AHT15 & AHT20 Digital Humidity & Temperature Sensor",
   "authors":
   {
     "name":  "ejoyneering",
@@ -12,7 +12,7 @@
     "type": "git",
     "url":  "https://github.com/enjoyneering/AHT10.git"
   },
-  "version":    "1.0.0",
+  "version":    "1.1.0",
   "frameworks": "arduino",
   "platforms":  "*"
 }
