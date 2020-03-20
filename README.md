@@ -4,7 +4,16 @@
 
 This is an Arduino library for Aosong ASAIR AHT10, AHT15 & AHT20 Digital Humidity & Temperature Sensor
 
-- Supply voltage:               1.8v - 3.6v
+- Supply voltage:               1.8v - 3.6v for AHT10, AHT15
+                                2.0v - 5.5v for AHT20
+- Temperature range:            -40°C..+80°C
+- Temperature resolution:       0.01°C
+- Temperature accuracy:         ±0.3°C
+- Relative humidity range:      0%..100%
+- Relative humidity resolution: 0.024%
+- Relative humidity accuracy:   ±2%**
+- I²C bus speed:                0Hz - 400KHz
+- Recomended polling frequency: 8sec - 30sec***
 - Temperature range:            -40°C..+80°C
 - Temperature resolution:       0.01°C
 - Temperature accuracy:         ±0.3°C
