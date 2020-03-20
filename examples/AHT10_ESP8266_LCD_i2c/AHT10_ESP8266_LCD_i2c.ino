@@ -75,16 +75,17 @@ void setup()
   while (myAHT10.begin(SDA, SCL) != true)
   {
     lcd.setCursor(0, 0);
-    lcd.print(F("AHT10 error"));
+    lcd.print(F("AHT10 not connected or fail to load calibration coefficient"));
     delay(5000);
   }
 
+//Wire.setClock(400000);            //experimental I2C speed! 400KHz, default 100KHz
+//Wire.setClockStretchLimit(10000); //experimental I2C clock stretch intervals!, default 230usec
+
   lcd.clear();
 
-//Wire.setClock(400000); //experimental I2C speed! 400KHz, default 100KHz
-
   lcd.print(F("AHT10 OK"));
-  delay(1000);
+  delay(2000);
 
   lcd.clear();
 
