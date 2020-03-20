@@ -44,10 +44,10 @@ void setup()
   
   while (myAHT10.begin() != true)
   {
-    Serial.println(F("AHT10/AHT15 sensor defective or not connected")); //(F()) save string to flash & keeps dynamic memory free
+    Serial.println(F("AHT10 not connected or fail to load calibration coefficient")); //(F()) save string to flash & keeps dynamic memory free
     delay(5000);
   }
-  Serial.println(F("AHT10/AHT15 is active"));
+  Serial.println(F("AHT10 OK"));
 
 //Wire.setClock(400000);                                                //experimental I2C speed! 400KHz, default 100KHz
 }
