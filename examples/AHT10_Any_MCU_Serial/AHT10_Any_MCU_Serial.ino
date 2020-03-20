@@ -49,7 +49,7 @@ void setup()
   }
   Serial.println(F("AHT10 OK"));
 
-//Wire.setClock(400000);                                                //experimental I2C speed! 400KHz, default 100KHz
+//Wire.setClock(400000); //experimental I2C speed! 400KHz, default 100KHz
 }
 
 
