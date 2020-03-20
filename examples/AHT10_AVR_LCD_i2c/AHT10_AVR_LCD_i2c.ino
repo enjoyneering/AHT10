@@ -63,13 +63,13 @@ void setup()
   /* AHT10 connection check */
   while (myAHT10.begin() != true)
   {
-    lcd.print(F("AHT10 error"));                             //(F()) saves string to flash & keeps dynamic memory free
+    lcd.print(F("AHT10 not connected or fail to load calibration coefficient")); //(F()) saves string to flash & keeps dynamic memory free
     delay(5000);
   }
 
-  lcd.clear();
-
 //Wire.setClock(400000);                                     //experimental I2C speed! 400KHz, default 100KHz
+
+  lcd.clear();
 
   lcd.print(F("AHT10 OK"));
   delay(2000);
