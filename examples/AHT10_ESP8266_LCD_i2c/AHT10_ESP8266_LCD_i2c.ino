@@ -46,7 +46,7 @@ const uint8_t temperature_icon[8] PROGMEM = {0x04, 0x0A, 0x0A, 0x0A, 0x0A, 0x1F,
 const uint8_t humidity_icon[8]    PROGMEM = {0x04, 0x0E, 0x0E, 0x1F, 0x1F, 0x1F, 0x0E, 0x00};
 const uint8_t plus_minus_icon[8]  PROGMEM = {0x00, 0x04, 0x0E, 0x04, 0x00, 0x0E, 0x00, 0x00};
 
-AHT10             myAHT10();
+AHT10             myAHT10(AHT10_ADDRESS_0X38);
 LiquidCrystal_I2C lcd(PCF8574_ADDR_A21_A11_A01, 4, 5, 6, 16, 11, 12, 13, 14, POSITIVE);
 
 
@@ -105,20 +105,20 @@ void loop()
   /* prints dynamic temperature data */
   lcd.setCursor(1, 0);
 
-  valueTH = myAHT10.readTemperature(AHT10_FORCE_READ_DATA);           //read 6-bytes over I2C
+  valueTH = myAHT10.readTemperature(AHT10_FORCE_READ_DATA); //read 6-bytes over I2C
 
   if   (valueTH != AHT10_ERROR) lcd.print(valueTH);
   else                          lcd.print(F("xxx"));
 
-  lcd.write(2);                                                       //print custom plus/minus symbol
+  lcd.write(2);                                             //print custom plus/minus symbol
   lcd.print(F("0.3"));
-  lcd.write(DEGREE_SYMBOL);                                           //print degree symbol from the LCD ROM
+  lcd.write(DEGREE_SYMBOL);                                 //print degree symbol from the LCD ROM
   lcd.print(F("C  "));
 
   /* prints dynamic humidity data */
   lcd.setCursor(1, 1);
 
-  valueTH = myAHT10.readHumidity(AHT10_USE_READ_DATA);                //use same 6-bytes
+  valueTH = myAHT10.readHumidity(AHT10_USE_READ_DATA);      //use same 6-bytes
 
   if   (valueTH != AHT10_ERROR) lcd.print(valueTH);
   else                          lcd.print(F("xxx"));
