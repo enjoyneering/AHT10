@@ -38,9 +38,10 @@
     Constructor
 */
 /**************************************************************************/
-AHT10::AHT10(uint8_t address)
+AHT10::AHT10(uint8_t address, ASAIR_I2C_SENSOR sensorName)
 {
-  _address = address;
+  _address    = address;
+  _sensorName = sensorName; 
 }
 
 /**************************************************************************/
@@ -72,8 +73,11 @@ bool AHT10::begin(void)
   Wire.setClock(100000);          //experimental! AVR I2C bus speed: 31kHz..400kHz/31000..400000, default 100000
 #endif
 
-  /* sensor initialization, load factory calibration coeff */
-  return enableFactoryCalCoeff();
+  delay(AHT10_POWER_ON_DELAY);    //wait for sensor to initialize 
+
+  setNormalMode();                //one measurement+sleep mode
+
+  return enableFactoryCalCoeff(); //load factory calibration coeff
 }
 
 
@@ -88,29 +92,34 @@ uint8_t AHT10::readRawData()
 {
   /* send measurment command */
   Wire.beginTransmission(_address);
-  #if ARDUINO >= 100
-  Wire.write(AHT10_START_MEASURMENT_CMD);                  //send measurment command
+  #if (ARDUINO) >= 100
+  Wire.write(AHT10_START_MEASURMENT_CMD);                                     //send measurment command
+  Wire.write(AHT10_DATA_MEASURMENT_CMD);                                      //send measurment parameter
+  Wire.write(AHT10_DATA_NOP);                                                 //send measurment parameter
   #else
   Wire.send(AHT10_START_MEASURMENT_CMD);
+  Wire.send(AHT10_DATA_MEASURMENT_CMD);
+  Wire.send(AHT10_DATA_NOP);
   #endif
-  if (Wire.endTransmission(true) != 0) return AHT10_ERROR; //error handler, collision on I2C bus
+  if (Wire.endTransmission(true) != 0) return AHT10_ERROR;                    //error handler, collision on I2C bus
 
-  if (getBusyBit() != 0x00) delay(AHT10_MEASURMENT_DELAY); //measurement delay
+  if (getCalibrationBit() != 0x01)             return AHT10_ERROR;            //error handler, calibration coefficient turned off
+  if (getBusyBit(AHT10_USE_READ_DATA) != 0x00) delay(AHT10_MEASURMENT_DELAY); //measurement delay
 
   /* read 6-bytes from sensor */
   #if defined(_VARIANT_ARDUINO_STM32_)
   Wire.requestFrom(_address, 6);
   #else
-  Wire.requestFrom(_address, 6, true);                     //true - send stop after transmission & release I2C bus
+  Wire.requestFrom(_address, 6, true);                                        //true - send stop after transmission & release I2C bus
   #endif
   if (Wire.available() != 6)
   {
-    _rawDataBuffer[0] = AHT10_ERROR;                       //for condition when AHT10_USE_READ_DATA is used
-    return AHT10_ERROR;                                    //check rxBuffer & error handler, collision on the i2c bus
+    _rawDataBuffer[0] = AHT10_ERROR;                                          //for condition when AHT10_USE_READ_DATA is used
+    return AHT10_ERROR;                                                       //check rxBuffer & error handler, collision on the i2c bus
   }
 
   /* read 6 bytes from "wire.h" rxBuffer */
-  #if ARDUINO >= 100
+  #if (ARDUINO) >= 100
   for (uint8_t i = 0; i < 6 ; i++)
   {
     _rawDataBuffer[i] = Wire.read();
@@ -149,7 +158,7 @@ float AHT10::readTemperature(bool readI2C)
 
   uint32_t temperature = ((uint32_t)(_rawDataBuffer[3] & 0x0F) << 16) | ((uint16_t)_rawDataBuffer[4] << 8) | _rawDataBuffer[5]; //20-bit raw temperature data
 
-  return (float)temperature * 200 / 1048576 - 50;
+  return (float)temperature * 0.000191 - 50;
 }
 
 
@@ -160,7 +169,7 @@ float AHT10::readTemperature(bool readI2C)
     Read relative humidity, %
 
     NOTE:
-    - Prolonged exposure for 60 hours at humidity > 80% can lead to a
+    - prolonged exposure for 60 hours at humidity > 80% can lead to a
       temporary drift of the signal +3%. Sensor slowly returns to the
       calibrated state at normal operating conditions.
     - relative humidity range      0%..100%
@@ -179,7 +188,7 @@ float AHT10::readHumidity(bool readI2C)
 
   uint32_t rawData = (((uint32_t)_rawDataBuffer[1] << 16) | ((uint16_t)_rawDataBuffer[2] << 8) | (_rawDataBuffer[3])) >> 4; //20-bit raw humidity data
 
-  float humidity = (float)rawData * 100 / 1048576;
+  float humidity = (float)rawData * 0.000095;
 
   if (humidity < 0)   return 0;
   if (humidity > 100) return 100;
@@ -202,7 +211,7 @@ bool AHT10::softReset(void)
 {
   Wire.beginTransmission(_address);
 
-  #if ARDUINO >= 100
+  #if (ARDUINO) >= 100
   Wire.write(AHT10_SOFT_RESET_CMD);
   #else
   Wire.send(AHT10_SOFT_RESET_CMD);
@@ -211,6 +220,8 @@ bool AHT10::softReset(void)
   if (Wire.endTransmission(true) != 0) return false; //safety check, make sure sensor reset
 
   delay(AHT10_SOFT_RESET_DELAY);
+
+  setNormalMode();                                   //reinitialize sensor registers after reset
 
   return enableFactoryCalCoeff();                    //reinitialize sensor registers after reset
 }
@@ -223,25 +234,27 @@ bool AHT10::softReset(void)
     Set normal measurment mode
 
     NOTE:
-    - one measurement & power down
+    - one measurement & power down??? no info in datasheet!!!
 */
 /**************************************************************************/
 bool AHT10::setNormalMode(void)
 {
   Wire.beginTransmission(_address);
 
-  #if ARDUINO >= 100
-  Wire.write(AHT10_INIT_CMD);                        //set command mode
-  Wire.write(AHT10_INIT_CAL_ENABLE);                 //x,0,0,x,0,x,x,x
+  #if (ARDUINO) >= 100
+  Wire.write(AHT10_NORMAL_CMD);
+  Wire.write(AHT10_DATA_NOP);
+  Wire.write(AHT10_DATA_NOP);
   #else
-  Wire.send(AHT10_INIT_CMD);
-  Wire.send(AHT10_INIT_CAL_ENABLE);
+  Wire.send(AHT10_NORMAL_CMD);
+  Wire.send(AHT10_DATA_NOP);
+  Wire.send(AHT10_DATA_NOP);
   #endif
 
   if (Wire.endTransmission(true) != 0) return false; //safety check, make sure transmission complete
 
-  delay(AHT10_COMMAND_DELAY);
-
+  delay(AHT10_CMD_DELAY);
+  
   return true;
 }
 
@@ -260,19 +273,20 @@ bool AHT10::setCycleMode(void)
 {
   Wire.beginTransmission(_address);
 
-  #if ARDUINO >= 100
-  Wire.write(AHT10_INIT_CMD);                                //set command mode
-  Wire.write(AHT10_INIT_CYCLE_MODE | AHT10_INIT_CAL_ENABLE); //x,0,1,x,0,x,x,x
+  #if (ARDUINO) >= 100
+  if   (_sensorName != AHT20_SENSOR) Wire.write(AHT10_INIT_CMD); //set command mode
+  else                               Wire.write(AHT20_INIT_CMD); 
+  Wire.write(AHT10_INIT_CYCLE_MODE | AHT10_INIT_CAL_ENABLE);     //0,[0,1],0,[1],0,0,0
+  Wire.write(AHT10_DATA_NOP); 
   #else
-  Wire.send(AHT10_INIT_CMD);
+  if   (_sensorName != AHT20_SENSOR) Wire.send(AHT10_INIT_CMD);
+  else                               Wire.send(AHT20_INIT_CMD); 
   Wire.send(AHT10_INIT_CYCLE_MODE | AHT10_INIT_CAL_ENABLE);
+  Wire.send(AHT10_DATA_NOP); 
   #endif
 
-  if (Wire.endTransmission(true) != 0) return false;         //safety check, make sure transmission complete
-
-  delay(AHT10_COMMAND_DELAY);
-
-  return true;
+  if (Wire.endTransmission(true) != 0) return false;             //safety check, make sure transmission complete
+                                       return true;
 }
 
 
@@ -293,7 +307,7 @@ uint8_t AHT10::readStatusByte()
   if (Wire.available() != 1) return AHT10_ERROR; //check rxBuffer & error handler, collision on I2C bus
 
   /* read byte from "wire.h" rxBuffer */
-  #if ARDUINO >= 100
+  #if (ARDUINO) >= 100
   return Wire.read();
   #else
   return Wire.receive();
@@ -333,17 +347,21 @@ bool AHT10::enableFactoryCalCoeff()
   /* load factory calibration coeff */
   Wire.beginTransmission(_address);
 
-  #if ARDUINO >= 100
-  Wire.write(AHT10_INIT_CMD);                        //set command mode
-  Wire.write(AHT10_INIT_CAL_ENABLE);                 //x,x,x,x,0,x,x,x
+  #if (ARDUINO) >= 100
+  if   (_sensorName != AHT20_SENSOR) Wire.write(AHT10_INIT_CMD); //set command mode
+  else                               Wire.write(AHT20_INIT_CMD);
+  Wire.write(AHT10_INIT_CAL_ENABLE);                             //0,0,0,0,[1],0,0,0
+  Wire.write(AHT10_DATA_NOP);                                    //0,0,0,0,0,0,0,0
   #else
-  Wire.send(AHT10_INIT_CMD);
+  if   (_sensorName != AHT20_SENSOR) Wire.send(AHT10_INIT_CMD);
+  else                               Wire.send(AHT20_INIT_CMD);
   Wire.send(AHT10_INIT_CAL_ENABLE);
+  Wire.send(AHT10_DATA_NOP);
   #endif
 
-  if (Wire.endTransmission(true) != 0) return false; //safety check, make sure transmission complete
+  if (Wire.endTransmission(true) != 0) return false;             //safety check, make sure transmission complete
 
-  delay(AHT10_COMMAND_DELAY);
+  delay(AHT10_CMD_DELAY);
 
   /*check calibration enable */
   if (getCalibrationBit() == 0x01) return true;
@@ -358,8 +376,8 @@ bool AHT10::enableFactoryCalCoeff()
     Read busy bit from status byte
 
     NOTE:
-    - 0, sensor idle
-    - 1, sensor busy
+    - 0, sensor idle & sleeping
+    - 1, sensor busy & in measurement state
 */
 /**************************************************************************/
 uint8_t AHT10::getBusyBit(bool readI2C)
