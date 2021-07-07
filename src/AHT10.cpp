@@ -92,15 +92,9 @@ uint8_t AHT10::readRawData()
 {
   /* send measurment command */
   Wire.beginTransmission(_address);
-  #if (ARDUINO) >= 100
   Wire.write(AHT10_START_MEASURMENT_CMD);                                     //send measurment command
   Wire.write(AHT10_DATA_MEASURMENT_CMD);                                      //send measurment parameter
   Wire.write(AHT10_DATA_NOP);                                                 //send measurment parameter
-  #else
-  Wire.send(AHT10_START_MEASURMENT_CMD);
-  Wire.send(AHT10_DATA_MEASURMENT_CMD);
-  Wire.send(AHT10_DATA_NOP);
-  #endif
   if (Wire.endTransmission(true) != 0) return AHT10_ERROR;                    //error handler, collision on I2C bus
 
   if (getCalibrationBit() != 0x01)             return AHT10_ERROR;            //error handler, calibration coefficient turned off
@@ -119,18 +113,10 @@ uint8_t AHT10::readRawData()
   }
 
   /* read 6 bytes from "wire.h" rxBuffer */
-  #if (ARDUINO) >= 100
   for (uint8_t i = 0; i < 6 ; i++)
   {
     _rawDataBuffer[i] = Wire.read();
   }
-  #else
-  for (uint8_t i = 0; i < 6 ; i++)
-  {
-    _rawDataBuffer[i] = Wire.receive();
-  }
-  #endif
-
   return true;
 }
 
@@ -211,11 +197,7 @@ bool AHT10::softReset(void)
 {
   Wire.beginTransmission(_address);
 
-  #if (ARDUINO) >= 100
   Wire.write(AHT10_SOFT_RESET_CMD);
-  #else
-  Wire.send(AHT10_SOFT_RESET_CMD);
-  #endif
 
   if (Wire.endTransmission(true) != 0) return false; //safety check, make sure sensor reset
 
@@ -241,15 +223,9 @@ bool AHT10::setNormalMode(void)
 {
   Wire.beginTransmission(_address);
 
-  #if (ARDUINO) >= 100
   Wire.write(AHT10_NORMAL_CMD);
   Wire.write(AHT10_DATA_NOP);
   Wire.write(AHT10_DATA_NOP);
-  #else
-  Wire.send(AHT10_NORMAL_CMD);
-  Wire.send(AHT10_DATA_NOP);
-  Wire.send(AHT10_DATA_NOP);
-  #endif
 
   if (Wire.endTransmission(true) != 0) return false; //safety check, make sure transmission complete
 
@@ -273,17 +249,10 @@ bool AHT10::setCycleMode(void)
 {
   Wire.beginTransmission(_address);
 
-  #if (ARDUINO) >= 100
   if   (_sensorName != AHT20_SENSOR) Wire.write(AHT10_INIT_CMD); //set command mode
   else                               Wire.write(AHT20_INIT_CMD); 
   Wire.write(AHT10_INIT_CYCLE_MODE | AHT10_INIT_CAL_ENABLE);     //0,[0,1],0,[1],0,0,0
   Wire.write(AHT10_DATA_NOP); 
-  #else
-  if   (_sensorName != AHT20_SENSOR) Wire.send(AHT10_INIT_CMD);
-  else                               Wire.send(AHT20_INIT_CMD); 
-  Wire.send(AHT10_INIT_CYCLE_MODE | AHT10_INIT_CAL_ENABLE);
-  Wire.send(AHT10_DATA_NOP); 
-  #endif
 
   if (Wire.endTransmission(true) != 0) return false;             //safety check, make sure transmission complete
                                        return true;
@@ -307,11 +276,7 @@ uint8_t AHT10::readStatusByte()
   if (Wire.available() != 1) return AHT10_ERROR; //check rxBuffer & error handler, collision on I2C bus
 
   /* read byte from "wire.h" rxBuffer */
-  #if (ARDUINO) >= 100
   return Wire.read();
-  #else
-  return Wire.receive();
-  #endif
 }
 
 
@@ -347,17 +312,10 @@ bool AHT10::enableFactoryCalCoeff()
   /* load factory calibration coeff */
   Wire.beginTransmission(_address);
 
-  #if (ARDUINO) >= 100
   if   (_sensorName != AHT20_SENSOR) Wire.write(AHT10_INIT_CMD); //set command mode
   else                               Wire.write(AHT20_INIT_CMD);
   Wire.write(AHT10_INIT_CAL_ENABLE);                             //0,0,0,0,[1],0,0,0
   Wire.write(AHT10_DATA_NOP);                                    //0,0,0,0,0,0,0,0
-  #else
-  if   (_sensorName != AHT20_SENSOR) Wire.send(AHT10_INIT_CMD);
-  else                               Wire.send(AHT20_INIT_CMD);
-  Wire.send(AHT10_INIT_CAL_ENABLE);
-  Wire.send(AHT10_DATA_NOP);
-  #endif
 
   if (Wire.endTransmission(true) != 0) return false;             //safety check, make sure transmission complete
 
