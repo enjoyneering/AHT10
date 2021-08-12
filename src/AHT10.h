@@ -95,7 +95,7 @@ class AHT10
 
    AHT10(uint8_t address = AHT10_ADDRESS_0X38, ASAIR_I2C_SENSOR = AHT10_SENSOR);
 
-   #if defined(ESP8266)
+   #if defined(ESP8266) || defined(STM32F4xx)
    bool     begin(uint8_t sda = SDA, uint8_t scl = SCL);
    #else
    bool     begin();
