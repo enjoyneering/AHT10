@@ -1,6 +1,6 @@
 [![license-badge][]][license] ![version] [![stars][]][stargazers] ![hit-count] [![github-issues][]][issues]
 
-<h1>This library is no longer supported. New libraty here - https://github.com/enjoyneering/AHTxx</h1>
+<h1>This library is no longer supported. New library here - https://github.com/enjoyneering/AHTxx</h1>
 
 # Aosong ASAIR AHT10, AHT15 & AHT20
 
