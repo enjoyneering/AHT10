@@ -60,12 +60,14 @@ AHT10::AHT10(uint8_t address, ASAIR_I2C_SENSOR sensorName)
       - 4 other error
 */
 /**************************************************************************/
-#if defined(ESP8266)
+#if defined(ESP8266) || defined(STM32F4xx)
 bool AHT10::begin(uint8_t sda, uint8_t scl)
 {
   Wire.begin(sda, scl);
   Wire.setClock(100000);          //experimental! ESP8266 I2C bus speed: 50kHz..400kHz/50000..400000, default 100000
+  #if defined(ESP8266)
   Wire.setClockStretchLimit(230); //experimental! default 230usec
+  #endif
 #else
 bool AHT10::begin(void) 
 {
